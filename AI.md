@@ -29,3 +29,33 @@ Extended Pazuzu with task/item storage and retrieval capabilities:
 - **Added item counter**: Tracks the number of items stored in the array
 
 The program now functions as a simple task list manager where users can add items and view all stored items on demand.
+
+## Level-3
+
+### Task Management with Completion Status
+
+Transformed the simple list manager into a comprehensive task management system:
+
+#### Task Class Implementation
+- **Created Task.java**: New public class with proper object-oriented design
+- **Task fields**: `boolean isDone` (defaults to false) and `String name` (set by constructor)
+- **Task methods**: `markDone()`, `markNotDone()`, `checkIsDone()`, and `getName()`
+- **Complete documentation**: Added comprehensive Javadoc for all methods and class
+
+#### Enhanced Pazuzu Functionality
+- **Upgraded storage**: Changed from `String[]` to `Task[]` array for proper task objects
+- **Modified addToList()**: Now creates Task objects instead of storing raw strings
+- **Enhanced printList()**: Displays completion status with `[ ]` for incomplete and `[X]` for completed tasks
+- **Task completion commands**: Added `mark n` and `unmark n` commands for task status management
+- **Robust validation**: Range checking for task numbers with "No such task" error handling
+- **User feedback**: Confirmation messages showing updated task status after mark/unmark operations
+- **Error handling**: Handles invalid numbers and out-of-range task indices gracefully
+
+#### New Command Structure
+- `mark [number]`: Marks specified task as completed
+- `unmark [number]`: Marks specified task as incomplete  
+- `List`: Shows all tasks with visual completion indicators
+- `bye`: Exits the program
+- Any other input: Adds a new task to the list
+
+The program now provides a complete task management experience with visual status tracking and interactive task completion management.
