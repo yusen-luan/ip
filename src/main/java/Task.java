@@ -48,4 +48,12 @@ public class Task {
     public String getName() {
         return this.name;
     }
+    
+    /**
+     * Prints the task in the format [T][X] name where X appears only if the task is done.
+     */
+    public void printTask() {
+        String status = this.isDone ? "[X]" : "[ ]";
+        System.out.println("[T]" + status + " " + this.name);
+    }
 }

@@ -22,8 +22,7 @@ public class Pazuzu {
             } else if (input.startsWith("unmark ")) {
                 handleUnmarkCommand(input);
             } else {
-                addToList(input);
-                System.out.println("added: " + input);
+                handleTaskInput(input);
             }
             
             System.out.println("===========");
@@ -33,29 +32,15 @@ public class Pazuzu {
     }
     
     /**
-     * Adds a new task to the list if there is space available.
-     * Creates a new Task object with the given name and stores it in the internal array.
-     * The item count is incremented. If the array is full (100 items), the task will not be added.
-     * 
-     * @param taskName the name of the task to be added to the list
-     */
-    private static void addToList(String taskName) {
-        if (itemCount < 100) {
-            items[itemCount] = new Task(taskName);
-            itemCount++;
-        }
-    }
-    
-    /**
      * Prints all tasks currently stored in the list.
      * Each task is displayed with a numbered format starting from 1, 
-     * with completion status shown as [ ] for not done or [X] for done.
+     * using the task's printTask() method to show appropriate format based on task type.
      * If the list is empty, nothing will be printed.
      */
     private static void printList() {
         for (int i = 0; i < itemCount; i++) {
-            String status = items[i].checkIsDone() ? "[X]" : "[ ]";
-            System.out.println((i + 1) + ". " + status + " " + items[i].getName());
+            System.out.print((i + 1) + ". ");
+            items[i].printTask();
         }
     }
     
@@ -72,8 +57,8 @@ public class Pazuzu {
             if (taskNumber >= 1 && taskNumber <= itemCount) {
                 items[taskNumber - 1].markDone();
                 System.out.println("Nice! I've marked this task as done:");
-                String status = items[taskNumber - 1].checkIsDone() ? "[X]" : "[ ]";
-                System.out.println("  " + status + " " + items[taskNumber - 1].getName());
+                System.out.print("  ");
+                items[taskNumber - 1].printTask();
             } else {
                 System.out.println("No such task");
             }
@@ -95,13 +80,80 @@ public class Pazuzu {
             if (taskNumber >= 1 && taskNumber <= itemCount) {
                 items[taskNumber - 1].markNotDone();
                 System.out.println("OK, I've marked this task as not done yet:");
-                String status = items[taskNumber - 1].checkIsDone() ? "[X]" : "[ ]";
-                System.out.println("  " + status + " " + items[taskNumber - 1].getName());
+                System.out.print("  ");
+                items[taskNumber - 1].printTask();
             } else {
                 System.out.println("No such task");
             }
         } catch (NumberFormatException e) {
             System.out.println("No such task");
+        }
+    }
+    
+    /**
+     * Handles task input parsing and creation.
+     * Parses different task types based on input format:
+     * - "todo <name>" creates a basic Task
+     * - "deadline <name> /<deadline>" creates a Deadline task
+     * - "event <name> /<startDate> /<endDate>" creates an Event task
+     * 
+     * @param input the full input string from the user
+     */
+    private static void handleTaskInput(String input) {
+        if (input.startsWith("todo ")) {
+            String taskName = input.substring(5).trim();
+            addToList(new Task(taskName));
+            System.out.println("Got it. I've added this task:");
+            System.out.print("  ");
+            items[itemCount - 1].printTask();
+            System.out.println("Now you have " + itemCount + " tasks in the list.");
+        } else if (input.startsWith("deadline ")) {
+            String remaining = input.substring(9).trim();
+            int slashIndex = remaining.lastIndexOf('/');
+            if (slashIndex != -1 && slashIndex < remaining.length() - 1) {
+                String taskName = remaining.substring(0, slashIndex).trim();
+                String deadline = remaining.substring(slashIndex + 1).trim();
+                addToList(new Deadline(taskName, deadline));
+                System.out.println("Got it. I've added this task:");
+                System.out.print("  ");
+                items[itemCount - 1].printTask();
+                System.out.println("Now you have " + itemCount + " tasks in the list.");
+            } else {
+                System.out.println("Please provide deadline in format: deadline <name> /<deadline>");
+            }
+        } else if (input.startsWith("event ")) {
+            String remaining = input.substring(6).trim();
+            String[] parts = remaining.split("/");
+            if (parts.length == 3) {
+                String taskName = parts[0].trim();
+                String startDate = parts[1].trim();
+                String endDate = parts[2].trim();
+                addToList(new Event(taskName, startDate, endDate));
+                System.out.println("Got it. I've added this task:");
+                System.out.print("  ");
+                items[itemCount - 1].printTask();
+                System.out.println("Now you have " + itemCount + " tasks in the list.");
+            } else {
+                System.out.println("Please provide event in format: event <name> /<startDate> /<endDate>");
+            }
+        } else {
+            // Default behavior for backwards compatibility
+            addToList(new Task(input));
+            System.out.println("added: " + input);
+        }
+    }
+    
+    /**
+     * Adds a task to the list if there is space available.
+     * The task is stored in the internal array and the item count is incremented.
+     * If the array is full (100 items), the task will not be added.
+     * 
+     * @param task the Task object to be added to the list
+     */
+    private static void addToList(Task task) {
+        if (itemCount < 100) {
+            items[itemCount] = task;
+            itemCount++;
         }
     }
 }

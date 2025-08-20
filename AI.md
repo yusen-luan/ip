@@ -59,3 +59,65 @@ Transformed the simple list manager into a comprehensive task management system:
 - Any other input: Adds a new task to the list
 
 The program now provides a complete task management experience with visual status tracking and interactive task completion management.
+
+## Level-4
+
+### Created 3 types of tasks
+### Prompt: Create 2 .java files each represent a class that extends Task. Before we add them, add this new public method printTask() in Task that prints the Task as: [T][X<include x only if done>] <name of task>
+
+Deadline: has a String deadline, is printed in printTask as: [D][X] <name> (by: <deadline>)
+
+Event: has a String startDate and String endDate, is printed in printTask as: [E][X] <name> (from: <startDate> to: <endDate>)
+
+When listing out the tasks in Pazuzu, use the printTask function instead. 
+When scanner input start with "todo", the task is just Task, else if it starts with "deadline", create a Deadline and initialise the deadline field as whatever comes after "/" (and whatever between deadline and / will be the name), same logic goes for Event where you lookout for "Event" and two "/"
+
+### Polymorphic Task System Implementation
+
+Implemented a comprehensive polymorphic task management system with specialized task types:
+
+#### Enhanced Base Task Class
+- **Added printTask() method**: Base implementation prints `[T][X] name` format with completion status
+- **Polymorphic design**: Method designed to be overridden by subclasses for specialized formatting
+- **Consistent interface**: All task types now use uniform printing mechanism
+
+#### Deadline Task Class (Deadline.java)
+- **Extends Task**: Inherits all base functionality while adding deadline-specific features
+- **Additional field**: `String deadline` for storing deadline information
+- **Constructor**: `Deadline(String name, String deadline)` for initialization
+- **Overridden printTask()**: Displays format `[D][X] name (by: deadline)`
+- **Getter method**: `getDeadline()` for accessing deadline information
+- **Complete documentation**: Comprehensive Javadoc for all methods
+
+#### Event Task Class (Event.java)
+- **Extends Task**: Inherits all base functionality while adding event-specific features
+- **Additional fields**: `String startDate` and `String endDate` for event timing
+- **Constructor**: `Event(String name, String startDate, String endDate)` for initialization
+- **Overridden printTask()**: Displays format `[E][X] name (from: startDate to: endDate)`
+- **Getter methods**: `getStartDate()` and `getEndDate()` for accessing timing information
+- **Complete documentation**: Comprehensive Javadoc for all methods
+
+#### Advanced Command Parsing System
+- **Smart input parsing**: Recognizes different task type prefixes (`todo`, `deadline`, `event`)
+- **Flexible format handling**: 
+  - `todo <name>` → Creates basic Task
+  - `deadline <name> /<deadline>` → Creates Deadline with parsed deadline
+  - `event <name> /<startDate> /<endDate>` → Creates Event with parsed dates
+- **Error handling**: Validates input format and provides helpful error messages
+- **Backwards compatibility**: Unrecognized input creates basic Task objects
+
+#### Enhanced User Experience
+- **Improved feedback**: "Got it. I've added this task:" with task details and count
+- **Consistent formatting**: All task operations use polymorphic `printTask()` method
+- **Visual task types**: Clear differentiation between task types with `[T]`, `[D]`, `[E]` prefixes
+- **Robust validation**: Comprehensive error checking for malformed input
+
+#### Updated System Integration
+- **Modified printList()**: Now uses polymorphic `printTask()` for proper type-specific formatting
+- **Enhanced mark/unmark**: Feedback uses `printTask()` to show updated task with correct formatting
+- **Centralized task creation**: New `handleTaskInput()` method manages all task parsing and creation
+- **Type-agnostic operations**: Mark/unmark operations work seamlessly across all task types
+
+The system now provides a sophisticated task management experience with multiple task types, each with specialized formatting and information storage, while maintaining a clean and intuitive user interface.
+
+
