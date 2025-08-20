@@ -7,7 +7,7 @@ public class Pazuzu {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         
-        System.out.println("Hello! I'm Pazuzu!\nWhat can I do for you?\n");
+        System.out.println("Pazuzu, what u want?\n");
         
         while (true) {
             String input = scanner.nextLine();

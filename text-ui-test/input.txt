@@ -1,0 +1,22 @@
+todo Buy groceries
+todo Read book
+deadline Submit assignment /2023-12-01
+event Team meeting /2023-11-15 /2023-11-16
+List
+mark 1
+mark 3
+List
+unmark 1
+List
+delete 2
+List
+todo
+deadline homework
+event party /
+random command
+mark 99
+unmark 99
+delete 99
+unmark 1
+mark 2
+bye
