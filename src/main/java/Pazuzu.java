@@ -1,8 +1,8 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Pazuzu {
-    private static Task[] items = new Task[100];
-    private static int itemCount = 0;
+    private static ArrayList<Task> items = new ArrayList<>();
     
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -22,7 +22,9 @@ public class Pazuzu {
                     handleMarkCommand(input);
                 } else if (input.startsWith("unmark ")) {
                     handleUnmarkCommand(input);
-                } else if (input.startsWith("todo") || input.startsWith("deadline ") || input.startsWith("event ")) {
+                } else if (input.startsWith("delete ")) {
+                    handleDeleteCommand(input);
+                } else if (input.startsWith("todo") || input.startsWith("deadline") || input.startsWith("event")) {
                     handleTaskInput(input);
                 } else {
                     throw new PazuzuExceptions.UndefinedCmdException("Undefined command");
@@ -48,9 +50,9 @@ public class Pazuzu {
      * If the list is empty, nothing will be printed.
      */
     private static void printList() {
-        for (int i = 0; i < itemCount; i++) {
+        for (int i = 0; i < items.size(); i++) {
             System.out.print((i + 1) + ". ");
-            items[i].printTask();
+            items.get(i).printTask();
         }
     }
     
@@ -66,14 +68,14 @@ public class Pazuzu {
     private static void handleMarkCommand(String input) throws PazuzuExceptions.MarkingException {
         try {
             int taskNumber = Integer.parseInt(input.substring(5).trim());
-            if (taskNumber >= 1 && taskNumber <= itemCount) {
-                if (items[taskNumber - 1].checkIsDone()) {
+            if (taskNumber >= 1 && taskNumber <= items.size()) {
+                if (items.get(taskNumber - 1).checkIsDone()) {
                     throw new PazuzuExceptions.MarkingException("Task already done");
                 }
-                items[taskNumber - 1].markDone();
+                items.get(taskNumber - 1).markDone();
                 System.out.println("Nice! I've marked this task as done:");
                 System.out.print("  ");
-                items[taskNumber - 1].printTask();
+                items.get(taskNumber - 1).printTask();
             } else {
                 System.out.println("No such task");
             }
@@ -94,14 +96,14 @@ public class Pazuzu {
     private static void handleUnmarkCommand(String input) throws PazuzuExceptions.MarkingException {
         try {
             int taskNumber = Integer.parseInt(input.substring(7).trim());
-            if (taskNumber >= 1 && taskNumber <= itemCount) {
-                if (!items[taskNumber - 1].checkIsDone()) {
+            if (taskNumber >= 1 && taskNumber <= items.size()) {
+                if (!items.get(taskNumber - 1).checkIsDone()) {
                     throw new PazuzuExceptions.MarkingException("Task already not done");
                 }
-                items[taskNumber - 1].markNotDone();
+                items.get(taskNumber - 1).markNotDone();
                 System.out.println("OK, I've marked this task as not done yet:");
                 System.out.print("  ");
-                items[taskNumber - 1].printTask();
+                items.get(taskNumber - 1).printTask();
             } else {
                 System.out.println("No such task");
             }
@@ -132,8 +134,8 @@ public class Pazuzu {
             addToList(new Task(taskName));
             System.out.println("Got it. I've added this task:");
             System.out.print("  ");
-            items[itemCount - 1].printTask();
-            System.out.println("Now you have " + itemCount + " tasks in the list.");
+            items.get(items.size() - 1).printTask();
+            System.out.println("Now you have " + items.size() + " tasks in the list.");
         } else if (input.startsWith("deadline")) {
             if (input.length() <= 8 || !input.substring(8, 9).equals(" ")) {
                 throw new PazuzuExceptions.BadTaskException("Invalid deadline format");
@@ -151,8 +153,8 @@ public class Pazuzu {
             addToList(new Deadline(taskName, deadline));
             System.out.println("Got it. I've added this task:");
             System.out.print("  ");
-            items[itemCount - 1].printTask();
-            System.out.println("Now you have " + itemCount + " tasks in the list.");
+            items.get(items.size() - 1).printTask();
+            System.out.println("Now you have " + items.size() + " tasks in the list.");
         } else if (input.startsWith("event")) {
             if (input.length() <= 5 || !input.substring(5, 6).equals(" ")) {
                 throw new PazuzuExceptions.BadTaskException("Invalid event format");
@@ -171,22 +173,54 @@ public class Pazuzu {
             addToList(new Event(taskName, startDate, endDate));
             System.out.println("Got it. I've added this task:");
             System.out.print("  ");
-            items[itemCount - 1].printTask();
-            System.out.println("Now you have " + itemCount + " tasks in the list.");
+            items.get(items.size() - 1).printTask();
+            System.out.println("Now you have " + items.size() + " tasks in the list.");
         }
     }
     
     /**
-     * Adds a task to the list if there is space available.
-     * The task is stored in the internal array and the item count is incremented.
-     * If the array is full (100 items), the task will not be added.
+     * Adds a task to the list.
+     * The task is stored in the internal ArrayList.
      * 
      * @param task the Task object to be added to the list
      */
     private static void addToList(Task task) {
-        if (itemCount < 100) {
-            items[itemCount] = task;
-            itemCount++;
+        items.add(task);
+    }
+    
+    /**
+     * Handles the delete command to remove a task from the list.
+     * Parses the task number from the input and removes the corresponding task.
+     * If the task number is out of range, prints "No such task".
+     * 
+     * @param input the full input string starting with "delete "
+     */
+    private static void handleDeleteCommand(String input) {
+        try {
+            int taskNumber = Integer.parseInt(input.substring(7).trim());
+            if (taskNumber >= 1 && taskNumber <= items.size()) {
+                deleteTask(taskNumber);
+            } else {
+                System.out.println("No such task");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("No such task");
+        }
+    }
+    
+    /**
+     * Deletes a task from the list at the given 1-indexed position.
+     * Prints the deleted task information and a message.
+     * 
+     * @param taskNumber the 1-indexed position of the task to delete
+     */
+    private static void deleteTask(int taskNumber) {
+        Task deletedTask = items.get(taskNumber - 1);
+        items.remove(taskNumber - 1);
+        System.out.print("Deleted task ");
+        deletedTask.printTask();
+        if (!deletedTask.checkIsDone()) {
+            System.out.println("Guess ur not locked-in enough for this");
         }
     }
 }

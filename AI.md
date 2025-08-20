@@ -143,5 +143,25 @@ The system now provides a sophisticated task management experience with multiple
 - Custom humorous error messages for different error types
 - Program continues execution after displaying error messages
 
+## Level-6
+### Added Deletion
+### Prompt: Replace Task[] items with an ArrayList<Task>, refactor the code in Pazuzu to work with the ArrayList instead of Array. 
+
+In Pazuzu, create a new void deleteTask(int) method that removes the task in the arraylist at the given index (1-indexed not 0). The scanner input to detect is: delete <number>
+Upon deletion the message is: Deleted task <content from printTask> \n Guess ur not locked-in enough for this
+
+### ArrayList Refactoring and Delete Functionality
+
+#### Data Structure Upgrade
+- **Replaced Task[] array**: Switched to `ArrayList<Task>` for dynamic sizing
+- **Removed manual counting**: No longer need `itemCount` variable
+- **Updated all operations**: Refactored all array access to use ArrayList methods
+
+#### Delete Command Implementation
+- **Added delete command**: `delete <number>` removes tasks from list
+- **Created deleteTask() method**: Handles 1-indexed task removal
+- **Custom delete message**: Shows deleted task with "Guess ur not locked-in enough for this" message
+- **Range validation**: Proper error handling for invalid task numbers
+
 
 
