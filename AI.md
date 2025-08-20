@@ -1,5 +1,7 @@
 # AI.md
 
+# Model used: claude-4-sonnet
+
 ## Level-1
 
 ### Changes Made to Pazuzu.java
@@ -119,5 +121,27 @@ Implemented a comprehensive polymorphic task management system with specialized 
 - **Type-agnostic operations**: Mark/unmark operations work seamlessly across all task types
 
 The system now provides a sophisticated task management experience with multiple task types, each with specialized formatting and information storage, while maintaining a clean and intuitive user interface.
+
+## Level-5
+### Added exception handling
+### Prompt: Ensure that Pazuzu only accept inputs that starts with the 3 type of tasks or the mark/unmask/list/bye etc commands defined. Any other input will throw an exception (undefinedCmdException, to be defined, when caught print the message "HUHH???!!!"). If we received one of the 3 tasks but formatted wrongly, eg no "/", or empty name, throw another exception (badTaskException, caught message: "Stupid Task!"). If we tried marking a done task or unmark an undone task, that is markingException, message: "Can't even keep track of your own task". Define all these exceptions in a new class PazuzuExceptions
+
+### Comprehensive Error Handling Implementation
+
+#### Custom Exception Classes (PazuzuExceptions.java)
+- **UndefinedCmdException**: For unrecognized commands → "HUHH???!!!"
+- **BadTaskException**: For malformed task input → "Stupid Task!"
+- **MarkingException**: For redundant mark/unmark operations → "Can't even keep track of your own task"
+
+#### Strict Input Validation
+- **Command recognition**: Only accepts `todo`, `deadline`, `event`, `mark`, `unmark`, `List`, `bye`
+- **Format validation**: Validates task structure (slashes, empty names, proper spacing)
+- **Status validation**: Prevents marking done tasks or unmarking undone tasks
+
+#### Enhanced Error Messages
+- All exceptions caught with try-catch blocks in main loop
+- Custom humorous error messages for different error types
+- Program continues execution after displaying error messages
+
 
 
