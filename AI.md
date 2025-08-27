@@ -232,3 +232,4 @@ The parsing logic (should have its own method) should handle dates of various fo
 - **User-friendly messages**: Clear error messages for malformed date/time input
 
 ## Added JavaDoc commit
+## Added Coding standard
