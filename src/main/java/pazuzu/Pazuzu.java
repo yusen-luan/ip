@@ -47,6 +47,8 @@ public class Pazuzu {
                     handleUnmarkCommand(input);
                 } else if (input.startsWith("delete ")) {
                     handleDeleteCommand(input);
+                } else if (input.startsWith("find ")) {
+                    handleFindCommand(input);
                 } else if (input.startsWith("todo") || input.startsWith("deadline") || input.startsWith("event")) {
                     handleTaskCommand(input);
                 } else {
@@ -127,5 +129,16 @@ public class Pazuzu {
         Task deletedTask = tasks.deleteTask(taskNumber);
         ui.showTaskDeleted(deletedTask);
         storage.saveTasks(tasks);
+    }
+    
+    /**
+     * Handles the find command to search for tasks containing a keyword.
+     * 
+     * @param input the full input string starting with "find "
+     */
+    private void handleFindCommand(String input) throws PazuzuExceptions.BadTaskException {
+        String keyword = parser.parseFindCommand(input);
+        TaskList matchingTasks = tasks.findTasksContaining(keyword);
+        ui.showFoundTasks(matchingTasks, keyword);
     }
 }

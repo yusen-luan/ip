@@ -145,6 +145,24 @@ public class Ui {
     }
     
     /**
+     * Displays the search results for tasks containing a keyword.
+     * 
+     * @param matchingTasks the TaskList containing matching tasks
+     * @param keyword the search keyword that was used
+     */
+    public void showFoundTasks(TaskList matchingTasks, String keyword) {
+        if (matchingTasks.isEmpty()) {
+            System.out.println("where got " + keyword + "bro?");
+        } else {
+            System.out.println("Found:");
+            for (int i = 0; i < matchingTasks.getSize(); i++) {
+                System.out.print((i + 1) + ". ");
+                matchingTasks.getTask(i).printTask();
+            }
+        }
+    }
+    
+    /**
      * Closes the Scanner when the program exits.
      */
     public void close() {

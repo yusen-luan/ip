@@ -186,4 +186,22 @@ public class Parser {
     public int parseTaskNumber(String input, int commandLength) throws NumberFormatException {
         return Integer.parseInt(input.substring(commandLength).trim());
     }
+    
+    /**
+     * Parses a find command and extracts the search keyword.
+     * 
+     * @param input the find command string
+     * @return the search keyword
+     * @throws PazuzuExceptions.BadTaskException when format is invalid
+     */
+    public String parseFindCommand(String input) throws PazuzuExceptions.BadTaskException {
+        if (input.length() <= 5 || !input.substring(4, 5).equals(" ")) {
+            throw new PazuzuExceptions.BadTaskException("Invalid find format");
+        }
+        String keyword = input.substring(5).trim();
+        if (keyword.isEmpty()) {
+            throw new PazuzuExceptions.BadTaskException("Empty search keyword");
+        }
+        return keyword;
+    }
 }

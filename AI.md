@@ -233,3 +233,31 @@ The parsing logic (should have its own method) should handle dates of various fo
 
 ## Added JavaDoc commit
 ## Added Coding standard
+
+## Level-9
+### Implemented Find Feature
+### Prompt: Implement finding task by keyword. In Pazuzu, add "find" as a valid command followed for the search word.
+Then add the corresponding helper method in Pazuzu to parse the search word and then find it from the TaskList and display the messages on the ui. In Parser, add the method parseFindCommand to parse the user's search term and in TaskList implement findTaskContaining, looping through the tasklist and filter out the tasks containing the keyword.
+
+### Task Search Implementation
+
+#### Added Find Command Support
+- **Command recognition**: Added `find <keyword>` as a valid command in main loop
+- **Case-insensitive search**: Searches task names regardless of letter case
+- **Partial matching**: Matches keywords that appear anywhere in task names
+
+#### Parser Enhancement (Parser.java)
+- **Added parseFindCommand() method**: Extracts and validates search keyword from user input
+- **Input validation**: Checks for proper format (`find ` + keyword) and non-empty search terms
+- **Error handling**: Throws BadTaskException for invalid find command formats
+
+#### TaskList Search Functionality (TaskList.java)
+- **Added findTasksContaining() method**: Searches through all tasks for keyword matches
+- **Returns new TaskList**: Creates filtered list without modifying original task list
+- **Preserves task order**: Maintains original sequence of matching tasks
+
+#### UI Display Enhancement (Ui.java)
+- **Added showFoundTasks() method**: Displays search results with numbered format
+- **Custom messages**: Shows "where got [keyword]bro?" when no matches found, "Found:" when matches exist
+- **Consistent formatting**: Uses same numbered list format as regular task display 
+
