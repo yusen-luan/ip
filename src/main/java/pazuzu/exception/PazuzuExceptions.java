@@ -1,3 +1,4 @@
+package pazuzu.exception;
 /**
  * Contains custom exception classes for Pazuzu task management system.
  * Provides specific error handling for different types of user input errors.

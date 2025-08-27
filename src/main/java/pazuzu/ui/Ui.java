@@ -1,4 +1,8 @@
+package pazuzu.ui;
 import java.util.Scanner;
+
+import pazuzu.task.Task;
+import pazuzu.task.TaskList;
 
 /**
  * Handles all user interface interactions and display formatting.

@@ -1,4 +1,7 @@
+package pazuzu.task;
 import java.util.ArrayList;
+
+import pazuzu.exception.PazuzuExceptions;
 
 /**
  * Manages a list of tasks and provides operations to manipulate them.

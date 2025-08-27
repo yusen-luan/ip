@@ -1,3 +1,4 @@
+package pazuzu.task;
 /**
  * Represents a task with a name and completion status.
  * Tasks are not done by default when created.

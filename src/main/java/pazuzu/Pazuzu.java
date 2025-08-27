@@ -1,3 +1,11 @@
+package pazuzu;
+
+import pazuzu.exception.PazuzuExceptions;
+import pazuzu.parser.Parser;
+import pazuzu.storage.Storage;
+import pazuzu.task.Task;
+import pazuzu.task.TaskList;
+import pazuzu.ui.Ui;
 /**
  * Main controller class that coordinates between different components 
  * to provide a task management system.
