@@ -198,4 +198,35 @@ Whenever Pazuzu is first run, populate items with the tasks saved in ./data/pazu
 - **Data integrity**: File format ensures reliable save/load operations
 
  
+## Level-8
+### Date and Time parsing
+### Prompt: I need deadline and events to recognise date and time. Instead of storing their fields as Strings, they should be stored as java's LocalTime, their constructors will also take in LocalTime for deadline, startDate and endDate. The pasrsing of string into LocalTime and check for invalid time input (non date/time input) should be done in Pazuzu. 
 
+The parsing logic (should have its own method) should handle dates of various formats like "2019-10-15" (yyyy-mm-dd) and when outputting in getTask() the format should be MMM dd yyyy (Oct 15 2019). You can also use libraries like format.DateTimeFormatter or temporal.ChronoUnit (As a side note you can modify printTask to just print out getTask instead of formatting the string on its own). I also need the parsing logic to be able to parse time inputs beside just date. For example 3. mayhaps in pazuzu.txt's format would become acceptable since it has time given in 24hr format at the end of the dates. Change the field separator from "/" to "|" instead
+
+### Advanced Date and Time Parsing Implementation
+
+#### DateTime Class Upgrade
+- **Switched to LocalDateTime**: Changed from String to `LocalDateTime` for deadline, startDate, and endDate fields
+- **Updated constructors**: All task classes now accept `LocalDateTime` parameters
+- **Enhanced output formatting**: Display format changed to `"MMM dd yyyy HH:mm"` (e.g., "Oct 15 2019 14:30")
+
+#### Comprehensive Date/Time Parsing System
+- **Created parseDateTime() method**: Handles various input formats with optional time components
+- **Multiple date formats supported**: 
+  - `yyyy-MM-dd`, `yyyy/MM/dd`, `dd-MM-yyyy`, `dd/MM/yyyy`, `MM-dd-yyyy`, `MM/dd/yyyy`
+- **Flexible time parsing**: Accepts 24-hour format (e.g., "1437" → 14:37, "900" → 09:00)
+- **Default time handling**: Uses 00:00 when no time is specified
+- **Smart parsing logic**: Separates date and time components automatically
+
+#### Input Format Changes
+- **Field separator change**: Replaced "/" with "|" to avoid conflicts with date formats
+- **New command format**: 
+  - `deadline taskName|31/12/2024 1400`
+  - `event taskName|31/12/2004 0830|01/02/2005 2300`
+- **Backward compatibility**: File loading handles both old and new formats gracefully
+
+#### Enhanced Error Handling
+- **Date validation**: Comprehensive error checking for invalid date/time formats
+- **Graceful degradation**: Invalid date formats in saved files are skipped without crashing
+- **User-friendly messages**: Clear error messages for malformed date/time input

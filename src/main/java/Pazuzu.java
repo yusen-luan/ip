@@ -5,9 +5,86 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Pazuzu {
     private static ArrayList<Task> items = new ArrayList<>();
+    private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
+    
+    /**
+     * Parses a date string into a LocalDateTime object.
+     * Supports various input formats including yyyy-mm-dd with optional time in 24hr format.
+     * If no time is provided, defaults to 00:00.
+     * 
+     * @param dateTimeString the date string to parse (with optional time)
+     * @return the parsed LocalDateTime
+     * @throws PazuzuExceptions.BadTaskException if the date format is invalid
+     */
+    private static LocalDateTime parseDateTime(String dateTimeString) throws PazuzuExceptions.BadTaskException {
+        if (dateTimeString == null || dateTimeString.trim().isEmpty()) {
+            throw new PazuzuExceptions.BadTaskException("Empty date string");
+        }
+        
+        dateTimeString = dateTimeString.trim();
+        
+        // Check if there's a time component (look for space followed by 3-4 digits)
+        String datepart = dateTimeString;
+        LocalTime timepart = LocalTime.of(0, 0); // Default to 00:00
+        
+        // Split on space to separate date and time
+        String[] parts = dateTimeString.split("\\s+");
+        if (parts.length == 2) {
+            datepart = parts[0];
+            String timePart = parts[1];
+            
+            // Parse time in formats like "1437" (14:37) or "0900" (09:00)
+            if (timePart.matches("\\d{3,4}")) {
+                try {
+                    if (timePart.length() == 3) {
+                        // Format like "900" -> 09:00
+                        int hour = Integer.parseInt(timePart.substring(0, 1));
+                        int minute = Integer.parseInt(timePart.substring(1, 3));
+                        timepart = LocalTime.of(hour, minute);
+                    } else if (timePart.length() == 4) {
+                        // Format like "1437" -> 14:37
+                        int hour = Integer.parseInt(timePart.substring(0, 2));
+                        int minute = Integer.parseInt(timePart.substring(2, 4));
+                        timepart = LocalTime.of(hour, minute);
+                    }
+                } catch (Exception e) {
+                    throw new PazuzuExceptions.BadTaskException("Invalid time format: " + timePart + ". Use 24hr format like 1437 for 14:37");
+                }
+            } else {
+                throw new PazuzuExceptions.BadTaskException("Invalid time format: " + timePart + ". Use 24hr format like 1437 for 14:37");
+            }
+        }
+        
+        // Define possible input date formats
+        DateTimeFormatter[] dateFormatters = {
+            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+            DateTimeFormatter.ofPattern("yyyy/MM/dd"),
+            DateTimeFormatter.ofPattern("dd-MM-yyyy"),
+            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+            DateTimeFormatter.ofPattern("MM-dd-yyyy"),
+            DateTimeFormatter.ofPattern("MM/dd/yyyy"),
+            DateTimeFormatter.ofPattern("dd/MM/yyyy") // This should handle 12/12/2012
+        };
+        
+        for (DateTimeFormatter formatter : dateFormatters) {
+            try {
+                LocalDate date = LocalDate.parse(datepart, formatter);
+                return LocalDateTime.of(date, timepart);
+            } catch (DateTimeParseException e) {
+                // Try next format
+            }
+        }
+        
+        throw new PazuzuExceptions.BadTaskException("Invalid date format: " + datepart + ". Please use formats like yyyy-mm-dd or dd/mm/yyyy");
+    }
     
     public static void main(String[] args) {
         initTasks();
@@ -151,16 +228,17 @@ public class Pazuzu {
                 throw new PazuzuExceptions.BadTaskException("Invalid deadline format");
             }
             String remaining = input.substring(9).trim();
-            int slashIndex = remaining.lastIndexOf('/');
-            if (slashIndex == -1 || slashIndex >= remaining.length() - 1) {
+            int pipeIndex = remaining.lastIndexOf('|');
+            if (pipeIndex == -1 || pipeIndex >= remaining.length() - 1) {
                 throw new PazuzuExceptions.BadTaskException("Invalid deadline format");
             }
-            String taskName = remaining.substring(0, slashIndex).trim();
-            String deadline = remaining.substring(slashIndex + 1).trim();
+            String taskName = remaining.substring(0, pipeIndex).trim();
+            String deadline = remaining.substring(pipeIndex + 1).trim();
             if (taskName.isEmpty() || deadline.isEmpty()) {
                 throw new PazuzuExceptions.BadTaskException("Empty task name or deadline");
             }
-            addToList(new Deadline(taskName, deadline));
+            LocalDateTime parsedDeadline = parseDateTime(deadline);
+            addToList(new Deadline(taskName, parsedDeadline));
             System.out.println("Got it. I've added this task:");
             System.out.print("  ");
             items.get(items.size() - 1).printTask();
@@ -171,7 +249,7 @@ public class Pazuzu {
                 throw new PazuzuExceptions.BadTaskException("Invalid event format");
             }
             String remaining = input.substring(6).trim();
-            String[] parts = remaining.split("/");
+            String[] parts = remaining.split("\\|");
             if (parts.length != 3) {
                 throw new PazuzuExceptions.BadTaskException("Invalid event format");
             }
@@ -181,7 +259,9 @@ public class Pazuzu {
             if (taskName.isEmpty() || startDate.isEmpty() || endDate.isEmpty()) {
                 throw new PazuzuExceptions.BadTaskException("Empty task name, start date, or end date");
             }
-            addToList(new Event(taskName, startDate, endDate));
+            LocalDateTime parsedStartDate = parseDateTime(startDate);
+            LocalDateTime parsedEndDate = parseDateTime(endDate);
+            addToList(new Event(taskName, parsedStartDate, parsedEndDate));
             System.out.println("Got it. I've added this task:");
             System.out.print("  ");
             items.get(items.size() - 1).printTask();
@@ -331,8 +411,15 @@ public class Pazuzu {
             int byIndex = content.lastIndexOf(" (by: ");
             if (byIndex != -1 && content.endsWith(")")) {
                 String taskName = content.substring(0, byIndex);
-                String deadline = content.substring(byIndex + 6, content.length() - 1);
-                task = new Deadline(taskName, deadline);
+                String deadlineStr = content.substring(byIndex + 6, content.length() - 1);
+                try {
+                    // Parse the formatted date back to LocalDateTime
+                    LocalDateTime deadline = LocalDateTime.parse(deadlineStr, OUTPUT_FORMATTER);
+                    task = new Deadline(taskName, deadline);
+                } catch (Exception e) {
+                    // If parsing fails, skip this task
+                    return null;
+                }
             }
         } else if (taskType == 'E') {
             // Event task: "[E][X] task name (from: start to: end)"
@@ -340,9 +427,17 @@ public class Pazuzu {
             int toIndex = content.lastIndexOf(" to: ");
             if (fromIndex != -1 && toIndex != -1 && content.endsWith(")")) {
                 String taskName = content.substring(0, fromIndex);
-                String startDate = content.substring(fromIndex + 8, toIndex);
-                String endDate = content.substring(toIndex + 5, content.length() - 1);
-                task = new Event(taskName, startDate, endDate);
+                String startDateStr = content.substring(fromIndex + 8, toIndex);
+                String endDateStr = content.substring(toIndex + 5, content.length() - 1);
+                try {
+                    // Parse the formatted dates back to LocalDateTime
+                    LocalDateTime startDate = LocalDateTime.parse(startDateStr, OUTPUT_FORMATTER);
+                    LocalDateTime endDate = LocalDateTime.parse(endDateStr, OUTPUT_FORMATTER);
+                    task = new Event(taskName, startDate, endDate);
+                } catch (Exception e) {
+                    // If parsing fails, skip this task
+                    return null;
+                }
             }
         }
         

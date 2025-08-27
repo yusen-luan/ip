@@ -1,18 +1,22 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Represents a deadline task with a completion deadline.
  * Extends the base Task class to include deadline information.
  */
 public class Deadline extends Task {
-    private String deadline;
+    private LocalDateTime deadline;
+    private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
     
     /**
      * Creates a new deadline task with the given name and deadline.
      * The task is initially not done.
      * 
      * @param name the name of the deadline task
-     * @param deadline the deadline for completing this task
+     * @param deadline the deadline for completing this task as a LocalDateTime
      */
-    public Deadline(String name, String deadline) {
+    public Deadline(String name, LocalDateTime deadline) {
         super(name);
         this.deadline = deadline;
     }
@@ -20,9 +24,9 @@ public class Deadline extends Task {
     /**
      * Gets the deadline of this task.
      * 
-     * @return the deadline string
+     * @return the deadline as a LocalDateTime
      */
-    public String getDeadline() {
+    public LocalDateTime getDeadline() {
         return this.deadline;
     }
     
@@ -32,8 +36,7 @@ public class Deadline extends Task {
      */
     @Override
     public void printTask() {
-        String status = this.checkIsDone() ? "[X]" : "[ ]";
-        System.out.println("[D]" + status + " " + this.getName() + " (by: " + this.deadline + ")");
+        System.out.println(getTask());
     }
     
     /**
@@ -45,6 +48,7 @@ public class Deadline extends Task {
     @Override
     public String getTask() {
         String status = this.checkIsDone() ? "[X]" : "[ ]";
-        return "[D]" + status + " " + this.getName() + " (by: " + this.deadline + ")";
+        String formattedDate = this.deadline.format(OUTPUT_FORMATTER);
+        return "[D]" + status + " " + this.getName() + " (by: " + formattedDate + ")";
     }
 }
