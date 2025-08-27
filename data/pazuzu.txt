@@ -1,4 +1,4 @@
-1. [T][ ]    something
-2. [D][ ]  someTask (by: Jan 21 2001 00:00)
-3. [D][ ]  supaTask (by: May 05 2025 12:50)
-4. [E][ ] buy coffee (from: Aug 27 2025 13:00 to: Aug 27 2025 13:30)
+1. [T][ ]     something
+2. [D][ ]   someTask (by: Jan 21 2001 00:00)
+3. [D][ ]   supaTask (by: May 05 2025 12:50)
+4. [E][X]  buy coffee (from: Aug 27 2025 13:00 to: Aug 27 2025 13:30)
