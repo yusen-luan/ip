@@ -230,3 +230,5 @@ The parsing logic (should have its own method) should handle dates of various fo
 - **Date validation**: Comprehensive error checking for invalid date/time formats
 - **Graceful degradation**: Invalid date formats in saved files are skipped without crashing
 - **User-friendly messages**: Clear error messages for malformed date/time input
+
+## Added Coding standard
