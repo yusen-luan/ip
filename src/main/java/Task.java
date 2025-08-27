@@ -56,4 +56,14 @@ public class Task {
         String status = this.isDone ? "[X]" : "[ ]";
         System.out.println("[T]" + status + " " + this.name);
     }
+    
+    /**
+     * Returns the task formatted as a string in the format [T][X] name where X appears only if the task is done.
+     * 
+     * @return the formatted task string
+     */
+    public String getTask() {
+        String status = this.isDone ? "[X]" : "[ ]";
+        return "[T]" + status + " " + this.name;
+    }
 }

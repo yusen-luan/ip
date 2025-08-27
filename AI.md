@@ -163,5 +163,39 @@ Upon deletion the message is: Deleted task <content from printTask> \n Guess ur 
 - **Custom delete message**: Shows deleted task with "Guess ur not locked-in enough for this" message
 - **Range validation**: Proper error handling for invalid task numbers
 
+## Level-7
+### Added Saving
+### Prompt: Implement the following: whenever the tasks in items get updated, a version of the task list (in printList format) need to be saved in ./data/pazuzu.txt. You should first create a new method Task::getTask which does the same thing as printTask but return it as a String instead of printing. To save the updated task list in the correct location, create a new method in Pazuzu, void saveTaskUpdates(), which writes each line of getTask in each item into the file. Also handle the case where ./data/pazuzu.txt does not exist
 
+Whenever Pazuzu is first run, populate items with the tasks saved in ./data/pazuzu.txt. Implement this logic in Pazuzu::initTasks
+
+### File Persistence Implementation
+
+#### Task String Conversion Methods
+- **Added getTask() to Task classes**: Returns formatted task string instead of printing
+- **Polymorphic implementation**: Each task type (Task, Deadline, Event) overrides getTask()
+- **Consistent formatting**: Matches printTask() output exactly as String format
+- **Format examples**: `"[T][X] task name"`, `"[D][ ] name (by: deadline)"`, `"[E][ ] name (from: start to: end)"`
+
+#### Automatic File Saving System
+- **Created saveTaskUpdates() method**: Writes current task list to `./data/pazuzu.txt`
+- **Automatic directory creation**: Creates `./data/` folder if it doesn't exist  
+- **Numbered format**: Saves tasks as `"1. [T][X] task name"` matching printList format
+- **Integrated save triggers**: Called after every task modification (add, mark, unmark, delete)
+- **Error handling**: Graceful IOException handling with user feedback
+
+#### Task Loading on Startup
+- **Created initTasks() method**: Loads tasks from file when program starts
+- **Comprehensive parsing**: Recreates Task, Deadline, and Event objects from saved format
+- **Status preservation**: Maintains completion status from saved file
+- **Robust parsing**: Handles malformed lines gracefully, skips invalid entries
+- **Missing file handling**: Starts with empty list if no save file exists
+
+#### Complete Persistence Cycle
+- **Startup loading**: `initTasks()` populates task list from `./data/pazuzu.txt`
+- **Runtime saving**: `saveTaskUpdates()` writes after every task list change
+- **Session continuity**: Tasks persist across program restarts
+- **Data integrity**: File format ensures reliable save/load operations
+
+ 
 

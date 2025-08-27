@@ -35,4 +35,16 @@ public class Deadline extends Task {
         String status = this.checkIsDone() ? "[X]" : "[ ]";
         System.out.println("[D]" + status + " " + this.getName() + " (by: " + this.deadline + ")");
     }
+    
+    /**
+     * Returns the deadline task formatted as a string in the format [D][X] name (by: deadline) 
+     * where X appears only if the task is done.
+     * 
+     * @return the formatted deadline task string
+     */
+    @Override
+    public String getTask() {
+        String status = this.checkIsDone() ? "[X]" : "[ ]";
+        return "[D]" + status + " " + this.getName() + " (by: " + this.deadline + ")";
+    }
 }

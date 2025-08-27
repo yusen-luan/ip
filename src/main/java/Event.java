@@ -47,4 +47,16 @@ public class Event extends Task {
         String status = this.checkIsDone() ? "[X]" : "[ ]";
         System.out.println("[E]" + status + " " + this.getName() + " (from: " + this.startDate + " to: " + this.endDate + ")");
     }
+    
+    /**
+     * Returns the event task formatted as a string in the format [E][X] name (from: startDate to: endDate) 
+     * where X appears only if the task is done.
+     * 
+     * @return the formatted event task string
+     */
+    @Override
+    public String getTask() {
+        String status = this.checkIsDone() ? "[X]" : "[ ]";
+        return "[E]" + status + " " + this.getName() + " (from: " + this.startDate + " to: " + this.endDate + ")";
+    }
 }
