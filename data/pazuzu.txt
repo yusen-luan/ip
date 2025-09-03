@@ -1,5 +1,4 @@
-1. [T][ ]       something
-2. [D][ ]     someTask (by: Jan 21 2001 00:00)
-3. [E][X]    buy coffee (from: Aug 27 2025 13:00 to: Aug 27 2025 13:30)
-4. [E][ ]  sleep (from: Jul 07 2025 00:00 to: Aug 09 2040 00:00)
-5. [T][X] turn on light
+1. [T][X]        something
+2. [D][ ]      someTask (by: Jan 21 2001 00:00)
+3. [E][X]     buy coffee (from: Aug 27 2025 13:00 to: Aug 27 2025 13:30)
+4. [E][ ]   sleep (from: Jul 07 2025 00:00 to: Aug 09 2040 00:00)
