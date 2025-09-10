@@ -1,10 +1,5 @@
 package pazuzu.parser;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.DateTimeException;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 import pazuzu.exception.PazuzuExceptions;
 import pazuzu.task.Deadline;
@@ -12,9 +7,9 @@ import pazuzu.task.Event;
 import pazuzu.task.Task;
 
 /**
- * Handles parsing of user commands and date/time strings.
+ * Handles parsing of user commands.
  */
-public class Parser {
+public class CommandParser {
     // Command length constants
     public static final int MARK_COMMAND_LENGTH = 5;
     public static final int UNMARK_COMMAND_LENGTH = 7;
@@ -24,23 +19,24 @@ public class Parser {
     private static final int DEADLINE_COMMAND_LENGTH = 9;
     private static final int EVENT_COMMAND_LENGTH = 6;
     
-    // Time parsing constants
-    private static final int THREE_DIGIT_TIME_LENGTH = 3;
-    private static final int FOUR_DIGIT_TIME_LENGTH = 4;
-    private static final int HOUR_INDEX_THREE_DIGIT = 1;
-    private static final int MINUTE_INDEX_THREE_DIGIT = 1;
-    private static final int HOUR_INDEX_FOUR_DIGIT = 2;
-    private static final int MINUTE_INDEX_FOUR_DIGIT = 2;
-    
     // Minimum string lengths for validation
     private static final int MIN_TODO_INPUT_LENGTH = 4;
     private static final int MIN_DEADLINE_INPUT_LENGTH = 8;
     private static final int MIN_EVENT_INPUT_LENGTH = 5;
     private static final int MIN_FIND_INPUT_LENGTH = 4;
-    private static final int MIN_TASK_DATA_LENGTH = 6;
+    
+    // Date parser instance
+    private final DateParser dateParser;
     
     /**
-     * Parses a date string into a LocalDateTime object.
+     * Creates a new CommandParser with a DateParser instance.
+     */
+    public CommandParser() {
+        this.dateParser = new DateParser();
+    }
+    
+    /**
+     * Parses a date string into a LocalDateTime object using the DateParser.
      * Supports various input formats including yyyy-mm-dd with optional time in 24hr format.
      * If no time is provided, defaults to 00:00.
      * 
@@ -49,65 +45,7 @@ public class Parser {
      * @throws PazuzuExceptions.BadTaskException if the date format is invalid
      */
     public LocalDateTime parseDateTime(String dateTimeString) throws PazuzuExceptions.BadTaskException {
-        if (dateTimeString == null || dateTimeString.trim().isEmpty()) {
-            throw new PazuzuExceptions.BadTaskException("Empty date string");
-        }
-        
-        dateTimeString = dateTimeString.trim();
-        
-        // Check if there's a time component (look for space followed by 3-4 digits)
-        String datePart = dateTimeString;
-        LocalTime timePart = LocalTime.of(0, 0); // Default to 00:00
-        
-        // Split on space to separate date and time
-        String[] parts = dateTimeString.split("\\s+");
-        if (parts.length == 2) {
-            datePart = parts[0];
-            String timeString = parts[1];
-            
-            // Parse time in formats like "1437" (14:37) or "0900" (09:00)
-            if (timeString.matches("\\d{3,4}")) {
-                try {
-                    if (timeString.length() == THREE_DIGIT_TIME_LENGTH) {
-                        // Format like "900" -> 09:00
-                        int hour = Integer.parseInt(timeString.substring(0, HOUR_INDEX_THREE_DIGIT));
-                        int minute = Integer.parseInt(timeString.substring(MINUTE_INDEX_THREE_DIGIT, THREE_DIGIT_TIME_LENGTH));
-                        timePart = LocalTime.of(hour, minute);
-                    } else if (timeString.length() == FOUR_DIGIT_TIME_LENGTH) {
-                        // Format like "1437" -> 14:37
-                        int hour = Integer.parseInt(timeString.substring(0, HOUR_INDEX_FOUR_DIGIT));
-                        int minute = Integer.parseInt(timeString.substring(HOUR_INDEX_FOUR_DIGIT, FOUR_DIGIT_TIME_LENGTH));
-                        timePart = LocalTime.of(hour, minute);
-                    }
-                } catch (DateTimeException | NumberFormatException e) {
-                    throw new PazuzuExceptions.BadTaskException("Invalid time format: " + timeString + ". Use 24hr format like 1437 for 14:37");
-                }
-            } else {
-                throw new PazuzuExceptions.BadTaskException("Invalid time format: " + timeString + ". Use 24hr format like 1437 for 14:37");
-            }
-        }
-        
-        // Define possible input date formats
-        DateTimeFormatter[] dateFormatters = {
-            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
-            DateTimeFormatter.ofPattern("yyyy/MM/dd"),
-            DateTimeFormatter.ofPattern("dd-MM-yyyy"),
-            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
-            DateTimeFormatter.ofPattern("MM-dd-yyyy"),
-            DateTimeFormatter.ofPattern("MM/dd/yyyy"),
-            DateTimeFormatter.ofPattern("dd/MM/yyyy") // This should handle 12/12/2012
-        };
-        
-        for (DateTimeFormatter formatter : dateFormatters) {
-            try {
-                LocalDate date = LocalDate.parse(datePart, formatter);
-                return LocalDateTime.of(date, timePart);
-            } catch (DateTimeParseException e) {
-                // Try next formatter if current one fails
-            }
-        }
-        
-        throw new PazuzuExceptions.BadTaskException("Invalid date format: " + datePart + ". Please use formats like yyyy-mm-dd or dd/mm/yyyy");
+        return dateParser.parseDateTime(dateTimeString);
     }
     
     /**

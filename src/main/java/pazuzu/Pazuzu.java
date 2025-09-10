@@ -1,7 +1,7 @@
 package pazuzu;
 
 import pazuzu.exception.PazuzuExceptions;
-import pazuzu.parser.Parser;
+import pazuzu.parser.CommandParser;
 import pazuzu.storage.Storage;
 import pazuzu.task.Task;
 import pazuzu.task.TaskList;
@@ -40,14 +40,14 @@ public class Pazuzu {
     private static final String NO_SUCH_TASK_ERROR = "No such task";
     private TaskList tasks;
     private Storage storage;
-    private Parser parser;
+    private CommandParser parser;
     
     /**
      * Initializes the Pazuzu application for GUI integration.
      */
     public Pazuzu() {
         storage = new Storage();
-        parser = new Parser();
+        parser = new CommandParser();
         tasks = storage.loadTasks();
     }
     
@@ -110,7 +110,7 @@ public class Pazuzu {
      * Handles the mark command and returns confirmation message.
      */
     private String handleMarkCommand(String input) throws PazuzuExceptions.MarkingException, NumberFormatException, IndexOutOfBoundsException {
-        int taskNumber = parser.parseTaskNumber(input, Parser.MARK_COMMAND_LENGTH);
+        int taskNumber = parser.parseTaskNumber(input, CommandParser.MARK_COMMAND_LENGTH);
         Task markedTask = tasks.markTask(taskNumber);
         storage.saveTasks(tasks);
         return TASK_DONE_PREFIX + markedTask.getTask();
@@ -120,7 +120,7 @@ public class Pazuzu {
      * Handles the unmark command and returns confirmation message.
      */
     private String handleUnmarkCommand(String input) throws PazuzuExceptions.MarkingException, NumberFormatException, IndexOutOfBoundsException {
-        int taskNumber = parser.parseTaskNumber(input, Parser.UNMARK_COMMAND_LENGTH);
+        int taskNumber = parser.parseTaskNumber(input, CommandParser.UNMARK_COMMAND_LENGTH);
         Task unmarkedTask = tasks.unmarkTask(taskNumber);
         storage.saveTasks(tasks);
         return TASK_NOT_DONE_PREFIX + unmarkedTask.getTask();
@@ -140,7 +140,7 @@ public class Pazuzu {
      * Handles the delete command and returns confirmation message.
      */
     private String handleDeleteCommand(String input) throws NumberFormatException, IndexOutOfBoundsException {
-        int taskNumber = parser.parseTaskNumber(input, Parser.DELETE_COMMAND_LENGTH);
+        int taskNumber = parser.parseTaskNumber(input, CommandParser.DELETE_COMMAND_LENGTH);
         Task deletedTask = tasks.deleteTask(taskNumber);
         storage.saveTasks(tasks);
         String result = TASK_DELETED_PREFIX + deletedTask.getTask();
