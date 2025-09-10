@@ -105,8 +105,12 @@ public class Storage {
         }
         
         // Extract task type and completion status
+        assert taskData.charAt(0) == '[' : "Task data must start with '['";
         char taskType = taskData.charAt(1); // T, D, or E
+        assert taskData.charAt(2) == ']' : "Task type must be enclosed in brackets";
+        assert taskData.charAt(3) == '[' : "Status indicator must start with '['";
         boolean isDone = taskData.charAt(4) == 'X';
+        assert taskData.charAt(5) == ']' : "Status indicator must end with ']'";
         String content = taskData.substring(6); // Skip "[T][X] " part
         
         Task task = null;
@@ -118,6 +122,8 @@ public class Storage {
             // Deadline task: "[D][X] task name (by: deadline)"
             int byIndex = content.lastIndexOf(" (by: ");
             if (byIndex != -1 && content.endsWith(")")) {
+                assert byIndex > 0 : "Task name must exist before deadline";
+                assert content.length() > byIndex + 7 : "Deadline string must have content";
                 String taskName = content.substring(0, byIndex);
                 String deadlineStr = content.substring(byIndex + 6, content.length() - 1);
                 try {
