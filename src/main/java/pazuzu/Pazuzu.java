@@ -10,6 +10,34 @@ import pazuzu.task.TaskList;
  * to provide a task management system.
  */
 public class Pazuzu {
+    // Command strings
+    private static final String BYE_COMMAND = "bye";
+    private static final String LIST_COMMAND = "List";
+    private static final String MARK_COMMAND = "mark ";
+    private static final String UNMARK_COMMAND = "unmark ";
+    private static final String DELETE_COMMAND = "delete ";
+    private static final String FIND_COMMAND = "find ";
+    private static final String TODO_COMMAND = "todo";
+    private static final String DEADLINE_COMMAND = "deadline";
+    private static final String EVENT_COMMAND = "event";
+    
+    // Response messages
+    private static final String BYE_RESPONSE = "Bye.";
+    private static final String NO_TASKS_RESPONSE = "No tasks in your list.";
+    private static final String TASK_DONE_PREFIX = "done:\n  ";
+    private static final String TASK_NOT_DONE_PREFIX = "not done:\n  ";
+    private static final String TASK_ADDED_PREFIX = "Got it. I've added this task:\n  ";
+    private static final String TASK_ADDED_SUFFIX = "\nNow you have ";
+    private static final String TASK_ADDED_SUFFIX2 = " tasks in the list.";
+    private static final String TASK_DELETED_PREFIX = "Deleted task ";
+    private static final String TASK_NOT_LOCKED_IN = "\nGuess ur not locked-in enough for this";
+    private static final String FOUND_TASKS_PREFIX = "Found:\n";
+    
+    // Error messages
+    private static final String UNDEFINED_COMMAND_ERROR = "I don't understand that command. Please try again.";
+    private static final String BAD_TASK_ERROR = "Invalid task format. Please check your input.";
+    private static final String MARKING_ERROR = "Unable to change task status. Please check the task number.";
+    private static final String NO_SUCH_TASK_ERROR = "No such task";
     private TaskList tasks;
     private Storage storage;
     private Parser parser;
@@ -32,33 +60,33 @@ public class Pazuzu {
      */
     public String processCommand(String input) {
         try {
-            if (input.equals("bye")) {
-                return "Bye.";
-            } else if (input.equals("List")) {
+            if (input.equals(BYE_COMMAND)) {
+                return BYE_RESPONSE;
+            } else if (input.equals(LIST_COMMAND)) {
                 return handleListCommand();
-            } else if (input.startsWith("mark ")) {
+            } else if (input.startsWith(MARK_COMMAND)) {
                 return handleMarkCommand(input);
-            } else if (input.startsWith("unmark ")) {
+            } else if (input.startsWith(UNMARK_COMMAND)) {
                 return handleUnmarkCommand(input);
-            } else if (input.startsWith("delete ")) {
+            } else if (input.startsWith(DELETE_COMMAND)) {
                 return handleDeleteCommand(input);
-            } else if (input.startsWith("find ")) {
+            } else if (input.startsWith(FIND_COMMAND)) {
                 return handleFindCommand(input);
-            } else if (input.startsWith("todo") || input.startsWith("deadline") || input.startsWith("event")) {
+            } else if (input.startsWith(TODO_COMMAND) || input.startsWith(DEADLINE_COMMAND) || input.startsWith(EVENT_COMMAND)) {
                 return handleTaskCommand(input);
             } else {
                 throw new PazuzuExceptions.UndefinedCmdException("Undefined command");
             }
         } catch (PazuzuExceptions.UndefinedCmdException e) {
-            return "HUHH???!!!";
+            return UNDEFINED_COMMAND_ERROR;
         } catch (PazuzuExceptions.BadTaskException e) {
-            return "Stupid Task!";
+            return BAD_TASK_ERROR;
         } catch (PazuzuExceptions.MarkingException e) {
-            return "Can't even keep track of your own task";
+            return MARKING_ERROR;
         } catch (IndexOutOfBoundsException e) {
-            return "No such task";
+            return NO_SUCH_TASK_ERROR;
         } catch (NumberFormatException e) {
-            return "No such task";
+            return NO_SUCH_TASK_ERROR;
         }
     }
     
@@ -69,7 +97,7 @@ public class Pazuzu {
      */
     private String handleListCommand() {
         if (tasks.isEmpty()) {
-            return "No tasks in your list.";
+            return NO_TASKS_RESPONSE;
         }
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < tasks.getSize(); i++) {
@@ -82,20 +110,20 @@ public class Pazuzu {
      * Handles the mark command and returns confirmation message.
      */
     private String handleMarkCommand(String input) throws PazuzuExceptions.MarkingException, NumberFormatException, IndexOutOfBoundsException {
-        int taskNumber = parser.parseTaskNumber(input, 5);
+        int taskNumber = parser.parseTaskNumber(input, Parser.MARK_COMMAND_LENGTH);
         Task markedTask = tasks.markTask(taskNumber);
         storage.saveTasks(tasks);
-        return "done:\n  " + markedTask.getTask();
+        return TASK_DONE_PREFIX + markedTask.getTask();
     }
     
     /**
      * Handles the unmark command and returns confirmation message.
      */
     private String handleUnmarkCommand(String input) throws PazuzuExceptions.MarkingException, NumberFormatException, IndexOutOfBoundsException {
-        int taskNumber = parser.parseTaskNumber(input, 7);
+        int taskNumber = parser.parseTaskNumber(input, Parser.UNMARK_COMMAND_LENGTH);
         Task unmarkedTask = tasks.unmarkTask(taskNumber);
         storage.saveTasks(tasks);
-        return "not done:\n  " + unmarkedTask.getTask();
+        return TASK_NOT_DONE_PREFIX + unmarkedTask.getTask();
     }
     
     /**
@@ -105,19 +133,19 @@ public class Pazuzu {
         Task newTask = parser.parseTaskCommand(input);
         tasks.addTask(newTask);
         storage.saveTasks(tasks);
-        return "Got it. I've added this task:\n  " + newTask.getTask() + "\nNow you have " + tasks.getSize() + " tasks in the list.";
+        return TASK_ADDED_PREFIX + newTask.getTask() + TASK_ADDED_SUFFIX + tasks.getSize() + TASK_ADDED_SUFFIX2;
     }
     
     /**
      * Handles the delete command and returns confirmation message.
      */
     private String handleDeleteCommand(String input) throws NumberFormatException, IndexOutOfBoundsException {
-        int taskNumber = parser.parseTaskNumber(input, 7);
+        int taskNumber = parser.parseTaskNumber(input, Parser.DELETE_COMMAND_LENGTH);
         Task deletedTask = tasks.deleteTask(taskNumber);
         storage.saveTasks(tasks);
-        String result = "Deleted task " + deletedTask.getTask();
+        String result = TASK_DELETED_PREFIX + deletedTask.getTask();
         if (!deletedTask.checkIsDone()) {
-            result += "\nGuess ur not locked-in enough for this";
+            result += TASK_NOT_LOCKED_IN;
         }
         return result;
     }
@@ -129,9 +157,9 @@ public class Pazuzu {
         String keyword = parser.parseFindCommand(input);
         TaskList matchingTasks = tasks.findTasksContaining(keyword);
         if (matchingTasks.isEmpty()) {
-            return "where got " + keyword + "bro?";
+            return "No tasks found containing: " + keyword;
         } else {
-            StringBuilder result = new StringBuilder("Found:\n");
+            StringBuilder result = new StringBuilder(FOUND_TASKS_PREFIX);
             for (int i = 0; i < matchingTasks.getSize(); i++) {
                 result.append((i + 1)).append(". ").append(matchingTasks.getTask(i).getTask()).append("\n");
             }

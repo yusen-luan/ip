@@ -36,9 +36,9 @@ public class MainWindow extends AnchorPane {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
 
-    /** Injects the Duke instance */
-    public void setPazuzu(Pazuzu d) {
-        pazuzu = d;
+    /** Injects the Pazuzu instance */
+    public void setPazuzu(Pazuzu pazuzu) {
+        this.pazuzu = pazuzu;
         dialogContainer.getChildren().add(DialogBox.getPazuzuDialog("Pazuzu, what u want?", pazuzuImage));
     }
 

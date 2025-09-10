@@ -5,19 +5,19 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import pazuzu.task.Deadline;
 import pazuzu.task.Event;
 import pazuzu.task.Task;
 import pazuzu.task.TaskList;
+import pazuzu.util.DateTimeUtil;
 
 /**
  * Handles the loading and saving of tasks to the storage file.
  */
 public class Storage {
     private static final String FILE_PATH = "./data/pazuzu.txt";
-    private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
     
     /**
      * Saves the current task list to the storage file.
@@ -26,23 +26,17 @@ public class Storage {
      * @param taskList the TaskList containing all tasks to save
      */
     public void saveTasks(TaskList taskList) {
-        try {
-            // Create data directory if it doesn't exist
-            File dataDir = new File("./data");
-            if (!dataDir.exists()) {
-                dataDir.mkdirs();
-            }
-            
-            // Create or overwrite the file
-            File file = new File(FILE_PATH);
-            FileWriter writer = new FileWriter(file);
-            
+        // Create data directory if it doesn't exist
+        File dataDir = new File("./data");
+        if (!dataDir.exists()) {
+            dataDir.mkdirs();
+        }
+        
+        try (FileWriter writer = new FileWriter(new File(FILE_PATH))) {
             // Write each task using getTask() method
             for (int i = 0; i < taskList.getSize(); i++) {
                 writer.write((i + 1) + ". " + taskList.getTask(i).getTask() + "\n");
             }
-            
-            writer.close();
         } catch (IOException e) {
             System.out.println("Error saving tasks to file: " + e.getMessage());
         }
@@ -57,13 +51,12 @@ public class Storage {
     public TaskList loadTasks() {
         TaskList taskList = new TaskList();
         
-        try {
-            File file = new File(FILE_PATH);
-            if (!file.exists()) {
-                return taskList; // Return empty list if file doesn't exist
-            }
-            
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+        File file = new File(FILE_PATH);
+        if (!file.exists()) {
+            return taskList; // Return empty list if file doesn't exist
+        }
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             
             while ((line = reader.readLine()) != null) {
@@ -84,8 +77,6 @@ public class Storage {
                     taskList.addTask(task);
                 }
             }
-            
-            reader.close();
         } catch (IOException e) {
             System.out.println("Error loading tasks from file: " + e.getMessage());
         }
@@ -122,10 +113,10 @@ public class Storage {
                 String deadlineStr = content.substring(byIndex + 6, content.length() - 1);
                 try {
                     // Parse the formatted date back to LocalDateTime
-                    LocalDateTime deadline = LocalDateTime.parse(deadlineStr, OUTPUT_FORMATTER);
+                    LocalDateTime deadline = LocalDateTime.parse(deadlineStr, DateTimeUtil.OUTPUT_FORMATTER);
                     task = new Deadline(taskName, deadline);
-                } catch (Exception e) {
-                    // If parsing fails, skip this task
+                } catch (DateTimeParseException e) {
+                    // If date parsing fails, skip this task
                     return null;
                 }
             }
@@ -139,11 +130,11 @@ public class Storage {
                 String endDateStr = content.substring(toIndex + 5, content.length() - 1);
                 try {
                     // Parse the formatted dates back to LocalDateTime
-                    LocalDateTime startDate = LocalDateTime.parse(startDateStr, OUTPUT_FORMATTER);
-                    LocalDateTime endDate = LocalDateTime.parse(endDateStr, OUTPUT_FORMATTER);
+                    LocalDateTime startDate = LocalDateTime.parse(startDateStr, DateTimeUtil.OUTPUT_FORMATTER);
+                    LocalDateTime endDate = LocalDateTime.parse(endDateStr, DateTimeUtil.OUTPUT_FORMATTER);
                     task = new Event(taskName, startDate, endDate);
-                } catch (Exception e) {
-                    // If parsing fails, skip this task
+                } catch (DateTimeParseException e) {
+                    // If date parsing fails, skip this task
                     return null;
                 }
             }

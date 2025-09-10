@@ -1,14 +1,15 @@
 package pazuzu.task;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
+import pazuzu.util.DateTimeUtil;
 
 /**
  * Represents a deadline task with a completion deadline.
  * Extends the base Task class to include deadline information.
  */
 public class Deadline extends Task {
+    private static final String TASK_TYPE_DEADLINE = "[D]";
     private LocalDateTime deadline;
-    private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
     
     /**
      * Creates a new deadline task with the given name and deadline.
@@ -48,8 +49,8 @@ public class Deadline extends Task {
      */
     @Override
     public String getTask() {
-        String status = this.checkIsDone() ? "[X]" : "[ ]";
-        String formattedDate = this.deadline.format(OUTPUT_FORMATTER);
-        return "[D]" + status + " " + this.getName() + " (by: " + formattedDate + ")";
+        String status = this.checkIsDone() ? TASK_STATUS_DONE : TASK_STATUS_NOT_DONE;
+        String formattedDate = this.deadline.format(DateTimeUtil.OUTPUT_FORMATTER);
+        return TASK_TYPE_DEADLINE + status + " " + this.getName() + " (by: " + formattedDate + ")";
     }
 }
