@@ -14,6 +14,8 @@ public class Task {
      * @param name the name of the task
      */
     public Task(String name) {
+        assert name != null : "Task name cannot be null";
+        assert !name.trim().isEmpty() : "Task name cannot be empty";
         this.name = name;
         this.isDone = false;
     }

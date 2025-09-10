@@ -48,11 +48,15 @@ public class Parser {
                         // Format like "900" -> 09:00
                         int hour = Integer.parseInt(timePart.substring(0, 1));
                         int minute = Integer.parseInt(timePart.substring(1, 3));
+                        assert hour >= 0 && hour <= 23 : "Hour must be between 0-23";
+                        assert minute >= 0 && minute <= 59 : "Minute must be between 0-59";
                         timepart = LocalTime.of(hour, minute);
                     } else if (timePart.length() == 4) {
                         // Format like "1437" -> 14:37
                         int hour = Integer.parseInt(timePart.substring(0, 2));
                         int minute = Integer.parseInt(timePart.substring(2, 4));
+                        assert hour >= 0 && hour <= 23 : "Hour must be between 0-23";
+                        assert minute >= 0 && minute <= 59 : "Minute must be between 0-59";
                         timepart = LocalTime.of(hour, minute);
                     }
                 } catch (Exception e) {
@@ -172,6 +176,7 @@ public class Parser {
         }
         LocalDateTime parsedStartDate = parseDateTime(startDate);
         LocalDateTime parsedEndDate = parseDateTime(endDate);
+        assert !parsedEndDate.isBefore(parsedStartDate) : "Event end date must not be before start date";
         return new Event(taskName, parsedStartDate, parsedEndDate);
     }
     
