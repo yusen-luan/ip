@@ -1,5 +1,6 @@
 package pazuzu.task;
 import java.util.ArrayList;
+import java.time.LocalDateTime;
 
 import pazuzu.exception.PazuzuExceptions;
 
@@ -151,6 +152,108 @@ public class TaskList {
         }
         
         return new TaskList(matchingTasks);
+    }
+    
+    /**
+     * Edits a task based on the provided parameters.
+     * 
+     * @param taskNumber the 1-indexed position of the task to edit
+     * @param newName the new name (use "_" to keep current name)
+     * @param newDate1 the new first date (deadline for Deadline, start date for Event, "_" for Todo)
+     * @param newDate2 the new second date (end date for Event, "_" for others)
+     * @return the edited Task object
+     * @throws IndexOutOfBoundsException if the task number is invalid
+     * @throws PazuzuExceptions.BadTaskException if the edit parameters are invalid for the task type
+     */
+    public Task editTask(int taskNumber, String newName, String newDate1, String newDate2) 
+            throws IndexOutOfBoundsException, PazuzuExceptions.BadTaskException {
+        validateTaskNumber(taskNumber);
+        
+        Task task = tasks.get(taskNumber - 1);
+        
+        // Edit name if provided
+        if (!newName.equals("_")) {
+            task.setName(newName);
+        }
+        
+        // Edit task-specific fields based on task type
+        if (task instanceof Deadline) {
+            if (!newDate1.equals("_")) {
+                // For deadline, newDate1 is the deadline, newDate2 should be "_"
+                if (!newDate2.equals("_")) {
+                    throw new PazuzuExceptions.BadTaskException("Deadline tasks only have one date field");
+                }
+                // Parse the deadline date
+                // Note: We'll need to handle date parsing here or pass parsed dates from the caller
+                // For now, we'll assume the caller handles date parsing
+            }
+        } else if (task instanceof Event) {
+            if (!newDate1.equals("_")) {
+                // Parse start date
+                // Note: We'll need to handle date parsing here or pass parsed dates from the caller
+            }
+            if (!newDate2.equals("_")) {
+                // Parse end date
+                // Note: We'll need to handle date parsing here or pass parsed dates from the caller
+            }
+        } else {
+            // Task (Todo) - should not have any date fields
+            if (!newDate1.equals("_") || !newDate2.equals("_")) {
+                throw new PazuzuExceptions.BadTaskException("Todo tasks do not have date fields");
+            }
+        }
+        
+        return task;
+    }
+    
+    /**
+     * Edits a task with parsed date objects.
+     * 
+     * @param taskNumber the 1-indexed position of the task to edit
+     * @param newName the new name (use "_" to keep current name)
+     * @param newDate1 the new first date (deadline for Deadline, start date for Event, null for Todo)
+     * @param newDate2 the new second date (end date for Event, null for others)
+     * @return the edited Task object
+     * @throws IndexOutOfBoundsException if the task number is invalid
+     * @throws PazuzuExceptions.BadTaskException if the edit parameters are invalid for the task type
+     */
+    public Task editTask(int taskNumber, String newName, LocalDateTime newDate1, LocalDateTime newDate2) 
+            throws IndexOutOfBoundsException, PazuzuExceptions.BadTaskException {
+        validateTaskNumber(taskNumber);
+        
+        Task task = tasks.get(taskNumber - 1);
+        
+        // Edit name if provided
+        if (!newName.equals("_")) {
+            task.setName(newName);
+        }
+        
+        // Edit task-specific fields based on task type
+        if (task instanceof Deadline) {
+            Deadline deadlineTask = (Deadline) task;
+            if (newDate1 != null) {
+                // For deadline, newDate1 is the deadline, newDate2 should be null
+                if (newDate2 != null) {
+                    throw new PazuzuExceptions.BadTaskException("Deadline tasks only have one date field");
+                }
+                deadlineTask.setDeadline(newDate1);
+            }
+        } else if (task instanceof Event) {
+            Event eventTask = (Event) task;
+            if (newDate1 != null) {
+                eventTask.setStartDate(newDate1);
+            }
+            if (newDate2 != null) {
+                eventTask.setEndDate(newDate2);
+            }
+        } else {
+            // Task (Todo) - should not have any date fields
+            if (newDate1 != null || newDate2 != null) {
+                throw new PazuzuExceptions.BadTaskException("Todo tasks do not have date fields");
+            }
+        }
+        
+        return task;
     }
     
     /**

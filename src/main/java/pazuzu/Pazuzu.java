@@ -17,6 +17,7 @@ public class Pazuzu {
     private static final String UNMARK_COMMAND = "unmark ";
     private static final String DELETE_COMMAND = "delete ";
     private static final String FIND_COMMAND = "find ";
+    private static final String EDIT_COMMAND = "edit ";
     private static final String TODO_COMMAND = "todo";
     private static final String DEADLINE_COMMAND = "deadline";
     private static final String EVENT_COMMAND = "event";
@@ -32,6 +33,7 @@ public class Pazuzu {
     private static final String TASK_DELETED_PREFIX = "Deleted task ";
     private static final String TASK_NOT_LOCKED_IN = "\nGuess ur not locked-in enough for this";
     private static final String FOUND_TASKS_PREFIX = "Found:\n";
+    private static final String TASK_EDITED_PREFIX = "Task edited successfully:\n  ";
     
     // Error messages
     private static final String UNDEFINED_COMMAND_ERROR = "I don't understand that command. Please try again.";
@@ -75,6 +77,8 @@ public class Pazuzu {
                 return handleDeleteCommand(input);
             } else if (input.startsWith(FIND_COMMAND)) {
                 return handleFindCommand(input);
+            } else if (input.startsWith(EDIT_COMMAND)) {
+                return handleEditCommand(input);
             } else if (input.startsWith(TODO_COMMAND) || input.startsWith(DEADLINE_COMMAND) || input.startsWith(EVENT_COMMAND)) {
                 return handleTaskCommand(input);
             } else {
@@ -168,5 +172,31 @@ public class Pazuzu {
             }
             return result.toString().trim();
         }
+    }
+    
+    /**
+     * Handles the edit command and returns confirmation message.
+     */
+    private String handleEditCommand(String input) throws PazuzuExceptions.BadTaskException, NumberFormatException, IndexOutOfBoundsException {
+        String[] editParams = parser.parseEditCommand(input);
+        int taskNumber = Integer.parseInt(editParams[0]);
+        String newName = editParams[1];
+        String newDate1 = editParams[2];
+        String newDate2 = editParams[3];
+        
+        // Parse dates if they are not "_"
+        java.time.LocalDateTime parsedDate1 = null;
+        java.time.LocalDateTime parsedDate2 = null;
+        
+        if (!newDate1.equals("_")) {
+            parsedDate1 = parser.parseDateTime(newDate1);
+        }
+        if (!newDate2.equals("_")) {
+            parsedDate2 = parser.parseDateTime(newDate2);
+        }
+        
+        Task editedTask = tasks.editTask(taskNumber, newName, parsedDate1, parsedDate2);
+        storage.saveTasks(tasks);
+        return TASK_EDITED_PREFIX + editedTask.getTask();
     }
 }

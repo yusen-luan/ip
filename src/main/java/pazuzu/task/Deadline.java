@@ -34,6 +34,16 @@ public class Deadline extends Task {
     }
     
     /**
+     * Sets the deadline of this task.
+     * 
+     * @param deadline the new deadline as a LocalDateTime
+     */
+    public void setDeadline(LocalDateTime deadline) {
+        assert deadline != null : "Deadline cannot be null";
+        this.deadline = deadline;
+    }
+    
+    /**
      * Prints the deadline task in the format [D][X] name (by: deadline) 
      * where X appears only if the task is done.
      */

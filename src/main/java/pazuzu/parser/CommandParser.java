@@ -18,6 +18,7 @@ public class CommandParser {
     private static final int TODO_COMMAND_LENGTH = 5;
     private static final int DEADLINE_COMMAND_LENGTH = 9;
     private static final int EVENT_COMMAND_LENGTH = 6;
+    private static final int EDIT_COMMAND_LENGTH = 5;
     
     // Minimum string lengths for validation
     private static final int MIN_TODO_INPUT_LENGTH = 4;
@@ -166,5 +167,45 @@ public class CommandParser {
             throw new PazuzuExceptions.BadTaskException("Empty search keyword");
         }
         return keyword;
+    }
+    
+    /**
+     * Parses an edit command and extracts the task number and edit parameters.
+     * Format: edit <task number> |<new name>|<new startdate or deadline>|<new end date>
+     * Use "_" for fields that should not be changed.
+     * 
+     * @param input the edit command string
+     * @return an array containing [taskNumber, newName, newDate1, newDate2]
+     * @throws PazuzuExceptions.BadTaskException when format is invalid
+     */
+    public String[] parseEditCommand(String input) throws PazuzuExceptions.BadTaskException {
+        if (input.length() <= EDIT_COMMAND_LENGTH || !input.substring(EDIT_COMMAND_LENGTH - 1, EDIT_COMMAND_LENGTH).equals(" ")) {
+            throw new PazuzuExceptions.BadTaskException("Invalid edit format");
+        }
+        
+        String remaining = input.substring(EDIT_COMMAND_LENGTH).trim();
+        String[] parts = remaining.split("\\|");
+        
+        if (parts.length != 4) {
+            throw new PazuzuExceptions.BadTaskException("Invalid edit format. Use: edit <number> |<name>|<date1>|<date2>");
+        }
+        
+        // Extract task number
+        String taskNumberStr = parts[0].trim();
+        if (taskNumberStr.isEmpty()) {
+            throw new PazuzuExceptions.BadTaskException("Task number cannot be empty");
+        }
+        
+        // Extract edit parameters
+        String newName = parts[1].trim();
+        String newDate1 = parts[2].trim();
+        String newDate2 = parts[3].trim();
+        
+        // Validate that at least one field is being changed (not all "_")
+        if (newName.equals("_") && newDate1.equals("_") && newDate2.equals("_")) {
+            throw new PazuzuExceptions.BadTaskException("At least one field must be changed");
+        }
+        
+        return new String[]{taskNumberStr, newName, newDate1, newDate2};
     }
 }

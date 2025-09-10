@@ -48,6 +48,28 @@ public class Event extends Task {
     }
     
     /**
+     * Sets the start date of this event.
+     * 
+     * @param startDate the new start date as a LocalDateTime
+     */
+    public void setStartDate(LocalDateTime startDate) {
+        assert startDate != null : "Start date cannot be null";
+        assert !this.endDate.isBefore(startDate) : "Start date must not be after end date";
+        this.startDate = startDate;
+    }
+    
+    /**
+     * Sets the end date of this event.
+     * 
+     * @param endDate the new end date as a LocalDateTime
+     */
+    public void setEndDate(LocalDateTime endDate) {
+        assert endDate != null : "End date cannot be null";
+        assert !endDate.isBefore(this.startDate) : "End date must not be before start date";
+        this.endDate = endDate;
+    }
+    
+    /**
      * Prints the event task in the format [E][X] name (from: startDate to: endDate) 
      * where X appears only if the task is done.
      */

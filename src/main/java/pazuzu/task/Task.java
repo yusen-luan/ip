@@ -57,6 +57,17 @@ public class Task {
     }
     
     /**
+     * Sets the name of this task.
+     * 
+     * @param name the new name for the task
+     */
+    public void setName(String name) {
+        assert name != null : "Task name cannot be null";
+        assert !name.trim().isEmpty() : "Task name cannot be empty";
+        this.name = name;
+    }
+    
+    /**
      * Prints the task in the format [T][X] name where X appears only if the task is done.
      */
     public void printTask() {
