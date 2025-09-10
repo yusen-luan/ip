@@ -49,6 +49,9 @@ public class Pazuzu {
         storage = new Storage();
         parser = new CommandParser();
         tasks = storage.loadTasks();
+        assert storage != null : "Storage must be initialized";
+        assert parser != null : "Parser must be initialized";
+        assert tasks != null : "TaskList must be loaded successfully";
     }
     
     /**

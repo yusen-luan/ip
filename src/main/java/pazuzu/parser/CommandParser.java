@@ -134,6 +134,7 @@ public class CommandParser {
         }
         LocalDateTime parsedStartDate = parseDateTime(startDate);
         LocalDateTime parsedEndDate = parseDateTime(endDate);
+        assert !parsedEndDate.isBefore(parsedStartDate) : "Event end date must not be before start date";
         return new Event(taskName, parsedStartDate, parsedEndDate);
     }
     
