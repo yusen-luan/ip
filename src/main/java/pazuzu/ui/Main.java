@@ -12,7 +12,7 @@ import pazuzu.Pazuzu;
 import pazuzu.ui.controller.MainWindow;
 
 /**
- * A GUI for Duke using FXML.
+ * A GUI for Pazuzu using FXML.
  */
 public class Main extends Application {
 

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 
-import pazuzu.parser.Parser;
+import pazuzu.parser.CommandParser;
 import pazuzu.exception.PazuzuExceptions;
 import pazuzu.task.Task;
 import pazuzu.task.Deadline;
@@ -14,11 +14,11 @@ import pazuzu.task.Event;
  * Test class for Parser functionality including date parsing, task command parsing, and edge cases.
  */
 public class ParserTest {
-    private Parser parser;
+    private CommandParser parser;
 
     @BeforeEach
     public void setUp() {
-        parser = new Parser();
+        parser = new CommandParser();
     }
 
     // Tests for parseDateTime method

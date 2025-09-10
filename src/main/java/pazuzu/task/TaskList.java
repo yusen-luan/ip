@@ -44,13 +44,8 @@ public class TaskList {
      * @throws IndexOutOfBoundsException if the task number is invalid
      */
     public Task deleteTask(int taskNumber) throws IndexOutOfBoundsException {
-        if (taskNumber < 1 || taskNumber > tasks.size()) {
-            throw new IndexOutOfBoundsException("Task number out of range");
-        }
-        assert taskNumber >= 1 && taskNumber <= tasks.size() : "Task number must be within valid range";
-        int index = taskNumber - 1;
-        assert index >= 0 && index < tasks.size() : "Converted index must be valid for ArrayList access";
-        return tasks.remove(index);
+        validateTaskNumber(taskNumber);
+        return tasks.remove(taskNumber - 1);
     }
     
     /**
@@ -62,13 +57,8 @@ public class TaskList {
      * @throws PazuzuExceptions.MarkingException if the task is already done
      */
     public Task markTask(int taskNumber) throws IndexOutOfBoundsException, PazuzuExceptions.MarkingException {
-        if (taskNumber < 1 || taskNumber > tasks.size()) {
-            throw new IndexOutOfBoundsException("Task number out of range");
-        }
-        assert taskNumber >= 1 && taskNumber <= tasks.size() : "Task number must be within valid range";
-        int index = taskNumber - 1;
-        assert index >= 0 && index < tasks.size() : "Converted index must be valid for ArrayList access";
-        Task task = tasks.get(index);
+        validateTaskNumber(taskNumber);
+        Task task = tasks.get(taskNumber - 1);
         if (task.checkIsDone()) {
             throw new PazuzuExceptions.MarkingException("Task already done");
         }
@@ -85,13 +75,8 @@ public class TaskList {
      * @throws PazuzuExceptions.MarkingException if the task is already not done
      */
     public Task unmarkTask(int taskNumber) throws IndexOutOfBoundsException, PazuzuExceptions.MarkingException {
-        if (taskNumber < 1 || taskNumber > tasks.size()) {
-            throw new IndexOutOfBoundsException("Task number out of range");
-        }
-        assert taskNumber >= 1 && taskNumber <= tasks.size() : "Task number must be within valid range";
-        int index = taskNumber - 1;
-        assert index >= 0 && index < tasks.size() : "Converted index must be valid for ArrayList access";
-        Task task = tasks.get(index);
+        validateTaskNumber(taskNumber);
+        Task task = tasks.get(taskNumber - 1);
         if (!task.checkIsDone()) {
             throw new PazuzuExceptions.MarkingException("Task already not done");
         }
@@ -107,13 +92,8 @@ public class TaskList {
      * @throws IndexOutOfBoundsException if the task number is invalid
      */
     public Task getTaskByNumber(int taskNumber) throws IndexOutOfBoundsException {
-        if (taskNumber < 1 || taskNumber > tasks.size()) {
-            throw new IndexOutOfBoundsException("Task number out of range");
-        }
-        assert taskNumber >= 1 && taskNumber <= tasks.size() : "Task number must be within valid range";
-        int index = taskNumber - 1;
-        assert index >= 0 && index < tasks.size() : "Converted index must be valid for ArrayList access";
-        return tasks.get(index);
+        validateTaskNumber(taskNumber);
+        return tasks.get(taskNumber - 1);
     }
     
     /**
@@ -171,5 +151,17 @@ public class TaskList {
         }
         
         return new TaskList(matchingTasks);
+    }
+    
+    /**
+     * Validates that a task number is within valid range (1-indexed).
+     * 
+     * @param taskNumber the task number to validate
+     * @throws IndexOutOfBoundsException if the task number is invalid
+     */
+    private void validateTaskNumber(int taskNumber) throws IndexOutOfBoundsException {
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
+            throw new IndexOutOfBoundsException("Task number out of range");
+        }
     }
 }

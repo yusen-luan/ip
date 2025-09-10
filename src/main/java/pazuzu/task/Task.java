@@ -4,6 +4,10 @@ package pazuzu.task;
  * Tasks are not done by default when created.
  */
 public class Task {
+    // Task formatting constants
+    protected static final String TASK_TYPE_TODO = "[T]";
+    protected static final String TASK_STATUS_DONE = "[X]";
+    protected static final String TASK_STATUS_NOT_DONE = "[ ]";
     private boolean isDone;
     private String name;
     
@@ -65,7 +69,7 @@ public class Task {
      * @return the formatted task string
      */
     public String getTask() {
-        String status = this.isDone ? "[X]" : "[ ]";
-        return "[T]" + status + " " + this.name;
+        String status = this.isDone ? TASK_STATUS_DONE : TASK_STATUS_NOT_DONE;
+        return TASK_TYPE_TODO + status + " " + this.name;
     }
 }

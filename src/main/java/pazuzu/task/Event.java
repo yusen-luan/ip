@@ -1,15 +1,16 @@
 package pazuzu.task;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
+import pazuzu.util.DateTimeUtil;
 
 /**
  * Represents an event task with start and end dates.
  * Extends the base Task class to include event timing information.
  */
 public class Event extends Task {
+    private static final String TASK_TYPE_EVENT = "[E]";
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
     
     /**
      * Creates a new event task with the given name, start date, and end date.
@@ -63,9 +64,9 @@ public class Event extends Task {
      */
     @Override
     public String getTask() {
-        String status = this.checkIsDone() ? "[X]" : "[ ]";
-        String formattedStartDate = this.startDate.format(OUTPUT_FORMATTER);
-        String formattedEndDate = this.endDate.format(OUTPUT_FORMATTER);
-        return "[E]" + status + " " + this.getName() + " (from: " + formattedStartDate + " to: " + formattedEndDate + ")";
+        String status = this.checkIsDone() ? TASK_STATUS_DONE : TASK_STATUS_NOT_DONE;
+        String formattedStartDate = this.startDate.format(DateTimeUtil.OUTPUT_FORMATTER);
+        String formattedEndDate = this.endDate.format(DateTimeUtil.OUTPUT_FORMATTER);
+        return TASK_TYPE_EVENT + status + " " + this.getName() + " (from: " + formattedStartDate + " to: " + formattedEndDate + ")";
     }
 }

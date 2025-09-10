@@ -1,9 +1,5 @@
 package pazuzu.parser;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 import pazuzu.exception.PazuzuExceptions;
 import pazuzu.task.Deadline;
@@ -11,12 +7,36 @@ import pazuzu.task.Event;
 import pazuzu.task.Task;
 
 /**
- * Handles parsing of user commands and date/time strings.
+ * Handles parsing of user commands.
  */
-public class Parser {
+public class CommandParser {
+    // Command length constants
+    public static final int MARK_COMMAND_LENGTH = 5;
+    public static final int UNMARK_COMMAND_LENGTH = 7;
+    public static final int DELETE_COMMAND_LENGTH = 7;
+    private static final int FIND_COMMAND_LENGTH = 5;
+    private static final int TODO_COMMAND_LENGTH = 5;
+    private static final int DEADLINE_COMMAND_LENGTH = 9;
+    private static final int EVENT_COMMAND_LENGTH = 6;
+    
+    // Minimum string lengths for validation
+    private static final int MIN_TODO_INPUT_LENGTH = 4;
+    private static final int MIN_DEADLINE_INPUT_LENGTH = 8;
+    private static final int MIN_EVENT_INPUT_LENGTH = 5;
+    private static final int MIN_FIND_INPUT_LENGTH = 4;
+    
+    // Date parser instance
+    private final DateParser dateParser;
     
     /**
-     * Parses a date string into a LocalDateTime object.
+     * Creates a new CommandParser with a DateParser instance.
+     */
+    public CommandParser() {
+        this.dateParser = new DateParser();
+    }
+    
+    /**
+     * Parses a date string into a LocalDateTime object using the DateParser.
      * Supports various input formats including yyyy-mm-dd with optional time in 24hr format.
      * If no time is provided, defaults to 00:00.
      * 
@@ -25,69 +45,7 @@ public class Parser {
      * @throws PazuzuExceptions.BadTaskException if the date format is invalid
      */
     public LocalDateTime parseDateTime(String dateTimeString) throws PazuzuExceptions.BadTaskException {
-        if (dateTimeString == null || dateTimeString.trim().isEmpty()) {
-            throw new PazuzuExceptions.BadTaskException("Empty date string");
-        }
-        
-        dateTimeString = dateTimeString.trim();
-        
-        // Check if there's a time component (look for space followed by 3-4 digits)
-        String datepart = dateTimeString;
-        LocalTime timepart = LocalTime.of(0, 0); // Default to 00:00
-        
-        // Split on space to separate date and time
-        String[] parts = dateTimeString.split("\\s+");
-        if (parts.length == 2) {
-            datepart = parts[0];
-            String timePart = parts[1];
-            
-            // Parse time in formats like "1437" (14:37) or "0900" (09:00)
-            if (timePart.matches("\\d{3,4}")) {
-                try {
-                    if (timePart.length() == 3) {
-                        // Format like "900" -> 09:00
-                        int hour = Integer.parseInt(timePart.substring(0, 1));
-                        int minute = Integer.parseInt(timePart.substring(1, 3));
-                        assert hour >= 0 && hour <= 23 : "Hour must be between 0-23";
-                        assert minute >= 0 && minute <= 59 : "Minute must be between 0-59";
-                        timepart = LocalTime.of(hour, minute);
-                    } else if (timePart.length() == 4) {
-                        // Format like "1437" -> 14:37
-                        int hour = Integer.parseInt(timePart.substring(0, 2));
-                        int minute = Integer.parseInt(timePart.substring(2, 4));
-                        assert hour >= 0 && hour <= 23 : "Hour must be between 0-23";
-                        assert minute >= 0 && minute <= 59 : "Minute must be between 0-59";
-                        timepart = LocalTime.of(hour, minute);
-                    }
-                } catch (Exception e) {
-                    throw new PazuzuExceptions.BadTaskException("Invalid time format: " + timePart + ". Use 24hr format like 1437 for 14:37");
-                }
-            } else {
-                throw new PazuzuExceptions.BadTaskException("Invalid time format: " + timePart + ". Use 24hr format like 1437 for 14:37");
-            }
-        }
-        
-        // Define possible input date formats
-        DateTimeFormatter[] dateFormatters = {
-            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
-            DateTimeFormatter.ofPattern("yyyy/MM/dd"),
-            DateTimeFormatter.ofPattern("dd-MM-yyyy"),
-            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
-            DateTimeFormatter.ofPattern("MM-dd-yyyy"),
-            DateTimeFormatter.ofPattern("MM/dd/yyyy"),
-            DateTimeFormatter.ofPattern("dd/MM/yyyy") // This should handle 12/12/2012
-        };
-        
-        for (DateTimeFormatter formatter : dateFormatters) {
-            try {
-                LocalDate date = LocalDate.parse(datepart, formatter);
-                return LocalDateTime.of(date, timepart);
-            } catch (DateTimeParseException e) {
-                // Try next format
-            }
-        }
-        
-        throw new PazuzuExceptions.BadTaskException("Invalid date format: " + datepart + ". Please use formats like yyyy-mm-dd or dd/mm/yyyy");
+        return dateParser.parseDateTime(dateTimeString);
     }
     
     /**
@@ -117,10 +75,10 @@ public class Parser {
      * @throws PazuzuExceptions.BadTaskException when format is invalid
      */
     private Task parseTodoCommand(String input) throws PazuzuExceptions.BadTaskException {
-        if (input.length() <= 4 || !input.substring(4, 5).equals(" ")) {
+        if (input.length() <= MIN_TODO_INPUT_LENGTH || !input.substring(MIN_TODO_INPUT_LENGTH, TODO_COMMAND_LENGTH).equals(" ")) {
             throw new PazuzuExceptions.BadTaskException("Invalid todo format");
         }
-        String taskName = input.substring(5).trim();
+        String taskName = input.substring(TODO_COMMAND_LENGTH).trim();
         if (taskName.isEmpty()) {
             throw new PazuzuExceptions.BadTaskException("Empty task name");
         }
@@ -135,10 +93,10 @@ public class Parser {
      * @throws PazuzuExceptions.BadTaskException when format is invalid
      */
     private Deadline parseDeadlineCommand(String input) throws PazuzuExceptions.BadTaskException {
-        if (input.length() <= 8 || !input.substring(8, 9).equals(" ")) {
+        if (input.length() <= MIN_DEADLINE_INPUT_LENGTH || !input.substring(MIN_DEADLINE_INPUT_LENGTH, DEADLINE_COMMAND_LENGTH).equals(" ")) {
             throw new PazuzuExceptions.BadTaskException("Invalid deadline format");
         }
-        String remaining = input.substring(9).trim();
+        String remaining = input.substring(DEADLINE_COMMAND_LENGTH).trim();
         int pipeIndex = remaining.lastIndexOf('|');
         if (pipeIndex == -1 || pipeIndex >= remaining.length() - 1) {
             throw new PazuzuExceptions.BadTaskException("Invalid deadline format");
@@ -160,10 +118,10 @@ public class Parser {
      * @throws PazuzuExceptions.BadTaskException when format is invalid
      */
     private Event parseEventCommand(String input) throws PazuzuExceptions.BadTaskException {
-        if (input.length() <= 5 || !input.substring(5, 6).equals(" ")) {
+        if (input.length() <= MIN_EVENT_INPUT_LENGTH || !input.substring(MIN_EVENT_INPUT_LENGTH, EVENT_COMMAND_LENGTH).equals(" ")) {
             throw new PazuzuExceptions.BadTaskException("Invalid event format");
         }
-        String remaining = input.substring(6).trim();
+        String remaining = input.substring(EVENT_COMMAND_LENGTH).trim();
         String[] parts = remaining.split("\\|");
         if (parts.length != 3) {
             throw new PazuzuExceptions.BadTaskException("Invalid event format");
@@ -200,10 +158,10 @@ public class Parser {
      * @throws PazuzuExceptions.BadTaskException when format is invalid
      */
     public String parseFindCommand(String input) throws PazuzuExceptions.BadTaskException {
-        if (input.length() <= 5 || !input.substring(4, 5).equals(" ")) {
+        if (input.length() <= FIND_COMMAND_LENGTH || !input.substring(MIN_FIND_INPUT_LENGTH, FIND_COMMAND_LENGTH).equals(" ")) {
             throw new PazuzuExceptions.BadTaskException("Invalid find format");
         }
-        String keyword = input.substring(5).trim();
+        String keyword = input.substring(FIND_COMMAND_LENGTH).trim();
         if (keyword.isEmpty()) {
             throw new PazuzuExceptions.BadTaskException("Empty search keyword");
         }
