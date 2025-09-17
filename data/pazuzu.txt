@@ -1,7 +1,7 @@
-1. [T][X]           something
-2. [D][ ]         someTask (by: Jan 21 2001 00:00)
-3. [E][X]        buy coffee (from: Aug 27 2025 13:00 to: Aug 27 2025 13:30)
-4. [E][ ] delayed sleep (from: Jul 07 2025 00:00 to: Dec 31 2050 14:30)
-5. [T][X]   wake up
-6. [D][X]   take a break (by: Sep 10 2025 12:00)
-7. [E][ ]  dinner (from: Sep 13 2025 18:00 to: Sep 13 2025 22:00)
+1. [T][X] important task
+2. [D][ ]          someTask (by: Jan 21 2001 00:00)
+3. [E][X]         buy coffee (from: Aug 27 2025 13:00 to: Aug 27 2025 13:30)
+4. [E][ ]  delayed sleep (from: Jul 07 2025 00:00 to: Dec 31 2050 14:30)
+5. [T][X]    wake up
+6. [D][X]    take a break (by: Sep 10 2025 12:00)
+7. [E][ ]   dinner (from: Sep 13 2025 18:00 to: Sep 13 2025 22:00)

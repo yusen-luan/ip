@@ -102,7 +102,7 @@ public class Storage {
         assert taskData.charAt(3) == '[' : "Status indicator must start with '['";
         boolean isDone = taskData.charAt(4) == 'X';
         assert taskData.charAt(5) == ']' : "Status indicator must end with ']'";
-        String content = taskData.substring(6); // Skip "[T][X] " part
+        String content = taskData.substring(6).trim(); // Skip "[T][X] " part and trim leading spaces
         
         Task task = null;
         
