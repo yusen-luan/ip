@@ -8,6 +8,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import pazuzu.Pazuzu;
@@ -25,15 +26,38 @@ public class MainWindow extends AnchorPane {
     private TextField userInput;
     @FXML
     private Button sendButton;
+    @FXML
+    private HBox inputContainer;
 
     private Pazuzu pazuzu;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private Image pazuzuImage = new Image(this.getClass().getResourceAsStream("/images/DaPazuzu.png"));
+    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/user.png"));
+    private Image pazuzuImage = new Image(this.getClass().getResourceAsStream("/images/ai.png"));
 
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        
+        // Initialize send button state
+        updateSendButtonState();
+        
+        // Add listener to update send button when text changes
+        userInput.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateSendButtonState();
+        });
+    }
+    
+    /**
+     * Updates the send button appearance based on input field content.
+     */
+    private void updateSendButtonState() {
+        boolean hasText = !userInput.getText().trim().isEmpty();
+        if (hasText) {
+            sendButton.setStyle("-fx-background-color: #007AFF; -fx-background-radius: 17; -fx-border-radius: 17; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-color: transparent; -fx-cursor: hand; -fx-opacity: 1.0;");
+        } else {
+            sendButton.setStyle("-fx-background-color: #C7C7CC; -fx-background-radius: 17; -fx-border-radius: 17; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-color: transparent; -fx-cursor: hand; -fx-opacity: 0.6;");
+        }
+        sendButton.setDisable(!hasText);
     }
 
     /** Injects the Pazuzu instance */
@@ -48,7 +72,13 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     private void handleUserInput() {
-        String input = userInput.getText();
+        String input = userInput.getText().trim();
+        
+        // Don't process empty messages
+        if (input.isEmpty()) {
+            return;
+        }
+        
         String response = pazuzu.processCommand(input);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
